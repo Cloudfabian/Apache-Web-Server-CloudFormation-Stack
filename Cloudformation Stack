@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation Template to create Security Group, Key Pair, and EC2 instance.
+Parameters:
+  InstanceId:
+    Description: Name of an EC2 instance(s)
+    Type: String
+Resources:
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH and HTTP traffic
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  MyKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: MyKeyPair
+
+  MyInstance: 
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0f34c5ae932e6f0e4
+      SecurityGroupIds:
+        - !GetAtt "MySecurityGroup.GroupId"
+      KeyName: !Ref MyKeyPair
+      UserData: !Base64 |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+          yum install -y git
+          git clone https://github.com/notonprem/website_template.git
+          sudo cp -r website_template/* /var/www/html/
+Outputs:
+  InstanceId:
+    Description: The ID of the EC2 instance
+    Value: !Ref MyInstance
