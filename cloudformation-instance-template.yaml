@@ -18,12 +18,6 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
-
-  MyKeyPair:
-    Type: AWS::EC2::KeyPair
-    Properties:
-      KeyName: MyKeyPair
-
   MyInstance: 
     Type: AWS::EC2::Instance
     Properties:
@@ -31,7 +25,6 @@ Resources:
       ImageId: ami-0f34c5ae932e6f0e4
       SecurityGroupIds:
         - !GetAtt "MySecurityGroup.GroupId"
-      KeyName: !Ref MyKeyPair
       UserData: !Base64 |
           #!/bin/bash
           yum update -y
@@ -43,5 +36,5 @@ Resources:
           sudo cp -r website_template/* /var/www/html/
 Outputs:
   InstanceId:
-    Description: The ID of the EC2 instance
-    Value: !Ref MyInstance
+    Description: Public IPv4 of the instance
+    Value: !GetAtt MyInstance.PublicIp
