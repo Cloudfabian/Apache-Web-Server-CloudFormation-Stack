@@ -1,6 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: CloudFormation Template to create a Security Group and an EC2 instance, with the instance public Ip showing in the output section of the Stack
+Description: CloudFormation Template to create a Security Group and an EC2 instance, with the instance public Ip showing in the output section of the CloudFormation Stack
+
 Parameters:
+  Instancename:
+    Description: Name of an EC2 instance(s)
+    Type: String
 
 Resources:
   MySecurityGroup:
