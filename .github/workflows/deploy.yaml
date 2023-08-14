@@ -20,6 +20,11 @@ jobs:
       - name: Checkout code from master branch
         uses: actions/checkout@v2
 
+      - name: set up python
+        uses: actions/setup-python@v2
+        with:
+          Python-version: 3.x
+
       # Configure AWS Credential
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
