@@ -62,6 +62,20 @@ Resources:
       NatGatewayId:
         Ref: NatGateway
 
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH and HTTP traffic
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
   MyInstance:
     Type: AWS::EC2::Instance
     Properties:
@@ -70,14 +84,14 @@ Resources:
       SecurityGroupIds:
         - !GetAtt "MySecurityGroup.GroupId"
       UserData: !Base64 |
-        #!/bin/bash
-        yum update -y
-        yum install -y httpd
-        systemctl start httpd
-        systemctl enable httpd
-        yum install -y git
-        git clone https://github.com/notonprem/website_template.git
-        sudo cp -r website_template/* /var/www/html/
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+          yum install -y git
+          git clone https://github.com/notonprem/website_template.git
+          sudo cp -r website_template/* /var/www/html/
 
 Outputs:
   PublicIp:
