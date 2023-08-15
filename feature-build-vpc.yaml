@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09=09'
+AWSTemplateFormatVersion: '2010-09-09'
 Description: Scalable and Resilient Web Server Infrastructure
 Resources:
   VPC:
