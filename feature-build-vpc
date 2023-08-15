@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: '2010-09=09'
+Description: Scalable and Resilient Web Server Infrastructure
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 172.32.0.0/16
+  
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 172.32.10.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: us-east-1a
+  
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 172.32.20.0/24
+      AvailabilityZone: us-east-1b
+  
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+  
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+  
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId: !Ref PublicSubnet
+  
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+  
+  MyInstance: 
+     Type: AWS::EC2::Instance
+     Properties:
+       InstanceType: t2.micro
+       ImageId: ami-0f34c5ae932e6f0e4
+       SecurityGroupIds:
+         - !GetAtt "MySecurityGroup.GroupId"
+       UserData: !Base64 |
+           #!/bin/bash
+           yum update -y
+           yum install -y httpd
+           systemctl start httpd
+           systemctl enable httpd
+           yum install -y git
+           git clone https://github.com/notonprem/website_template.git
+           sudo cp -r website_template/* /var/www/html/
+    
+Outputs:
+      PublicIPAddress:
+        Description: Public IP address of the web server instance
+        Value: !GetAtt WebServerInstance.PublicIp
+
