@@ -2,7 +2,7 @@ name: 'Deploy to AWS CloudFormation'
 
 on: 
   push:
-    branches: [ master ]
+    branches: [ feature-build-vpc ]
   pull_request:
     branches: [ master ]
 
@@ -17,8 +17,10 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout code from master branch
+      - name: Checkout code from feature-build-vpc branch
         uses: actions/checkout@v2
+        with:
+          Ref: feature-build-vpc
 
       - name: set up node.js 16.x
         uses: actions/setup-node@v2
