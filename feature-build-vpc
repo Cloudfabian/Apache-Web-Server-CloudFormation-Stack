@@ -73,7 +73,7 @@ Resources:
            sudo cp -r website_template/* /var/www/html/
     
 Outputs:
-      PublicIPAddress:
-        Description: Public IP address of the web server instance
-        Value: !GetAtt WebServerInstance.PublicIp
+  PublicIp:
+    Description: My instance Public Ip
+    Value: !GetAtt MyInstance.PublicIp
 
