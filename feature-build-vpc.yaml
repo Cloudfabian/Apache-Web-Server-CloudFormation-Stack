@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: 2010-09=09
+AWSTemplateFormatVersion: '2010-09=09'
 Description: Scalable and Resilient Web Server Infrastructure
 Resources:
   VPC:
@@ -68,7 +68,7 @@ Resources:
       InstanceType: t2.micro
       ImageId: ami-0f34c5ae932e6f0e4
       SecurityGroupIds:
-        - GetAtt "MySecurityGroup.GroupId"
+        - !GetAtt "MySecurityGroup.GroupId"
       UserData: |
         #!/bin/bash
         yum update -y
@@ -82,5 +82,5 @@ Resources:
 Outputs:
   PublicIp:
     Description: My instance Public Ip
-    Value: MyInstance.PublicIp
+    Value: !GetAtt MyInstance.PublicIp
 
