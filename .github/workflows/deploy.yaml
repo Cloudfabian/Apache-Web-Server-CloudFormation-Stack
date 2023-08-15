@@ -40,5 +40,5 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: apache-web-server-stack
-          template: cloudformation-instance-template.yaml
+          template: feature-build-vpc.yaml
           no-fail-on-empty-changeset: "1"
