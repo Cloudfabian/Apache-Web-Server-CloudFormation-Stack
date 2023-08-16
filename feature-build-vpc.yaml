@@ -37,7 +37,7 @@ Resources:
       VpcId:
         Ref: VPC
 
-   NATGatewayEIP:
+  NATGatewayEIP:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
