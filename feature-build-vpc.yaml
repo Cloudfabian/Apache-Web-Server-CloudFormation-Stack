@@ -25,6 +25,18 @@ Resources:
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
+
+  NATGatewayEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NATGatewayEIP.AllocationId
+      SubnetId: !Ref PublicSubnet
+    
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -37,17 +49,6 @@ Resources:
       VpcId:
         Ref: VPC
 
-  NATGatewayEIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-
-  NATGateway:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt NATGatewayEIP.AllocationId
-      SubnetId: !Ref PublicSubnet
-  
   RouteNATGateway:
     DependsOn: NATGateway
     Type: AWS::EC2::Route
