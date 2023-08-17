@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Scalable and Resilient Web Server Infrastructure
 Resources:
   # First, we create a VPC
-  VPC:
+  myVPC:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 172.32.0.0/16
@@ -12,7 +12,7 @@ Resources:
   PublicSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref myVPC
       CidrBlock: 172.32.10.0/24
       MapPublicIpOnLaunch: true
       AvailabilityZone: us-east-1a   # Get the first AZ on the list
@@ -20,29 +20,29 @@ Resources:
   PrivateSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref myVPC
       CidrBlock: 172.32.20.0/24
       AvailabilityZone: us-east-1b   # Get the second AZ on the list
 
   PrivateRoute:             # Private route table can access web via NAT (created below)
     Type: AWS::EC2::Route
     Properties:
-      VpcId: VPC
+      VpcId: myVPC
   
   PublicRoute:                 # Public route table has direct routing to IGW:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: VPC
+      VpcId: myVPC
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref myVPC
 
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref myVPC
 
   # Attach the public subnets to public route tables,
   # and attach the private subnets to private route tables:
@@ -61,7 +61,7 @@ Resources:
   # The VPC will need internet access: 
   VpcInternetGateway:
     Type: AWS::EC2::InternetGateway
-    DependsOn: VPC
+    DependsOn: myVPC
 
   VpcInternetGateWayRoute:
     Type: AWS::EC2::Route
@@ -75,7 +75,7 @@ Resources:
     # You can't attach an IGW to a VPC unless both are created:
     Properties:
       InternetGatewayId: !Ref VpcInternetGateway
-      VpcId: !Ref VPC
+      VpcId: !Ref myVPC
 
   # A Nat Gateway:
   NatGateway:
@@ -95,21 +95,21 @@ Resources:
     Type: AWS::EC2::EIP
     DependsOn: VpcInternetAttachGateway
     Properties:
-      Domain: VPC
+      Domain: myVPC
 
   # A Public Route Table:
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     DependsOn: InternetGateway
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref myVPC
       
   # Here is a private route table:
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
     DependsOn: NatGateway
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref myVPC
       
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
