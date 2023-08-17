@@ -3,14 +3,14 @@ Description: Scalable and Resilient Web Server Infrastructure
 Resources:
   # First, we create a VPC
   Vpc:
-    Type: AWS::EC2::VPC
+    Type: AWS::EC2::Vpc
     Properties:
       CidrBlock: 172.32.0.0/16
 
   PublicSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
       CidrBlock: 172.32.10.0/24
       MapPublicIpOnLaunch: true
       AvailabilityZone: us-east-1a   # Get the first AZ on the list
@@ -18,7 +18,7 @@ Resources:
   PrivateSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
       CidrBlock: 172.32.20.0/24
       AvailabilityZone: us-east-1b   # Get the second AZ on the list
 
@@ -48,7 +48,7 @@ Resources:
   # The VPC will need internet access: 
   VpcInternetGateway:
     Type: AWS::EC2::InternetGateway
-    DependsOn: VPC
+    DependsOn: Vpc
 
   VpcInternetGateWayRoute:
     Type: AWS::EC2::Route
@@ -64,25 +64,25 @@ Resources:
       InternetGatewayId: !Ref VpcInternetGateway
       VpcId: !Ref VPC
 
-   # A Nat Gateway:
-   NatGateway:
+  # A Nat Gateway:
+  NatGateway:
     Type: AWS::EC2::NatGateway
     Properties:
-      AllocationId: !GetAtt ElasticIPAddress.AllocationId
-      SubnetId: !Ref PublicSubnet
+       AllocationId: !GetAtt ElasticIPAddress.AllocationId
+       SubnetId: !Ref PublicSubnet
 
-   NatGatewayRoute:
-     Type: AWS::EC2::Route
-     Properties:
-       DestinationCidrBlock: 0.0.0.0/0
-       Gatewayid: NatGateway
-       RouteTableId: PrivateRoute
+  NatGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      Gatewayid: NatGateway
+      RouteTableId: PrivateRoute
 
-   ElasticIPAddress:
+  ElasticIPAddress:
     Type: AWS::EC2::EIP
     DependsOn: VpcInternetAttachGateway
     Properties:
-      Domain: VPC
+      Domain: Vpc
 
   # A Public Route Table:
   PublicRouteTable:
@@ -96,7 +96,7 @@ Resources:
     Type: AWS::EC2::RouteTable
     DependsOn: NatGateway
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
       
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
