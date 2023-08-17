@@ -60,7 +60,7 @@ Resources:
     Properties:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
-      RouteTableId: !Ref PublicRoute
+      RouteTableId: !Ref PublicRouteTable
     
   InternetAttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
