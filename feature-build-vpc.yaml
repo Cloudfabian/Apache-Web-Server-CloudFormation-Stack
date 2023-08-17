@@ -23,12 +23,14 @@ Resources:
       VpcId: !Ref myVPC
       CidrBlock: 172.32.20.0/24
       AvailabilityZone: us-east-1b   # Get the second AZ on the list
-
+      
+  # PublicRouteTable resource definition
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref myVPC
-      
+
+  # PrivateRouteTable resource definition
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -66,6 +68,7 @@ Resources:
        AllocationId: !GetAtt ElasticIPAddress.AllocationId
        SubnetId: !Ref PublicSubnet
 
+  # Route for directing internet-bound traffic via Internet Gateway
   InternetGatewayRoute:
     Type: AWS::EC2::Route
     Properties:
@@ -73,6 +76,7 @@ Resources:
       GatewayId: !Ref InternetGateway
       RouteTableId: !Ref PublicRouteTable
 
+  # Route for directing outgoing traffic through a NAT Gateway
   NatGatewayRoute:
     Type: AWS::EC2::Route
     Properties:
@@ -80,16 +84,21 @@ Resources:
       NatGatewayId: !Ref NatGateway
       RouteTableId: !Ref PrivateRouteTable
 
+  # Elastic IP address resource for NAT Gateway
   ElasticIPAddress:
     Type: AWS::EC2::EIP
     DependsOn: InternetAttachGateway
     Properties:
+      # Specify the domain as 'vpc' to associate the EIP with the VPC
       Domain: vpc
-      
+
+  # Security Group for controlling inbound traffic
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      # Description of the security group's purpose
       GroupDescription: Allow SSH and HTTP traffic
+      # Define inbound rules for SSH and HTTP
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
