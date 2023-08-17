@@ -47,13 +47,14 @@ Resources:
   PublicSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-    SubnetId: !Ref PublicSubnet
-    RouteTableId: !Ref PublicRouteTable    
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+    
   PrivateSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-    SubnetId: !Ref PrivateSubnet
-    RouteTableId: PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrivateRouteTable
       
   # The VPC will need internet access: 
   VpcInternetGateway:
