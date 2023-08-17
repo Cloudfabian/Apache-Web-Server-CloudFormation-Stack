@@ -73,7 +73,7 @@ Resources:
     # You can't attach an IGW to a VPC unless both are created:
     Properties:
       InternetGatewayId: !Ref VpcInternetGateway
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
 
   # A Nat Gateway:
   NatGateway:
@@ -100,7 +100,7 @@ Resources:
     Type: AWS::EC2::RouteTable
     DependsOn: InternetGateway
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
       
   # Here is a private route table:
   PrivateRouteTable:
