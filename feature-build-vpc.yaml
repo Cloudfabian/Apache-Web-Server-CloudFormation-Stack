@@ -28,10 +28,7 @@ Resources:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref myVPC
-      Routes:
-      - DestinationCidrBlock: 0.0.0.0/0
-        GatewayId: !Ref InternetGateway
-
+      
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
