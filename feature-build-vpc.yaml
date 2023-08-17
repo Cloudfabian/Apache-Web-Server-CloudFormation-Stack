@@ -32,6 +32,16 @@ Resources:
     Properties:
       VpcId: Vpc
 
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+
   # Attach the public subnets to public route tables,
   # and attach the private subnets to private route tables:
   PublicSubnetRouteTableAssociation:
