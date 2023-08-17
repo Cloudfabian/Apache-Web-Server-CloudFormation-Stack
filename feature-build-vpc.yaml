@@ -55,13 +55,6 @@ Resources:
   InternetGateway:
     Type: AWS::EC2::InternetGateway
 
-  InternetGatewayRoute:
-    Type: AWS::EC2::Route
-    Properties:
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGateway
-      RouteTableId: !Ref PublicRouteTable
-    
   InternetAttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     # You can't attach an IGW to a VPC unless both are created:
@@ -75,6 +68,13 @@ Resources:
     Properties:
        AllocationId: !GetAtt ElasticIPAddress.AllocationId
        SubnetId: !Ref PublicSubnet
+
+  InternetGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PublicRouteTable
 
   NatGatewayRoute:
     Type: AWS::EC2::Route
