@@ -21,7 +21,7 @@ Resources:
   PublicSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref: VPC
+      VpcId: !Ref VPC
       CidrBlock: 172.32.10.0/24
       MapPublicIpOnLaunch: true
       AvailabilityZone: us-east-1a   # Get the first AZ on the list
