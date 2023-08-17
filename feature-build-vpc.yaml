@@ -59,22 +59,21 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable
       
   # The VPC will need internet access: 
-  VpcInternetGateway:
+  InternetGateway:
     Type: AWS::EC2::InternetGateway
-    DependsOn: myVPC
 
-  VpcInternetGateWayRoute:
+  InternetGateWayRoute:
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref VpcInternetGateWay
+      GatewayId: !Ref InternetGateWay
       RouteTableId: !Ref PublicRoute
     
-  VpcInternetAttachGateway:
+  InternetAttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     # You can't attach an IGW to a VPC unless both are created:
     Properties:
-      InternetGatewayId: !Ref VpcInternetGateway
+      InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref myVPC
 
   # A Nat Gateway:
@@ -93,7 +92,7 @@ Resources:
 
   ElasticIPAddress:
     Type: AWS::EC2::EIP
-    DependsOn: VpcInternetAttachGateway
+    DependsOn: InternetAttachGateway
     Properties:
       Domain: myVPC
 
