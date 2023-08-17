@@ -29,8 +29,7 @@ Resources:
   PrivateSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId:
-        Ref: VPC
+      VpcId: !Ref VPC
       CidrBlock: 172.32.20.0/24
       AvailabilityZone: us-east-1b   # Get the second AZ on the list
       
@@ -39,34 +38,28 @@ Resources:
     Type: AWS::EC2::RouteTable
     DependsOn: InternetGateway
     Properties:
-      VpcId:
-        !Ref: VPC
+      VpcId: !Ref VPC
   PublicRoute:               # Public route table has direct routing to IGW:
     Type: AWS::EC2::Route
     DependsOn: AttachGateway
     Properties:
-      RouteTableId:
-        !Ref: PublicRouteTable
+      RouteTableId: !Ref: PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId:
-        !Ref: InternetGateway
+      GatewayId: !Ref InternetGateway
         
   # Here is a private route table:
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
     DependsOn: NatGateway
     Properties:
-      VpcId:
-        !Ref: VPC
+      VpcId: !Ref VPC
   PrivateRoute:             # Private route table can access web via NAT (created below)
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId:
-        !Ref: PrivateRouteTable
+      RouteTableId: !Ref PrivateRouteTable
       DestinationCidrBlock: 0.0.0.0/0 
       # Route traffic through the NAT Gateway:
-      NatGatewayId:
-        !Ref: NatGateway
+      NatGatewayId: !Ref NatGateway
         
   # A Nat Gateway:
   NATGateway:
