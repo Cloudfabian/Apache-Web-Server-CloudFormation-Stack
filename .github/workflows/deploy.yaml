@@ -2,7 +2,7 @@ name: 'Deploy to AWS CloudFormation'
 
 on: 
   push:
-    branches: [ feature-build-vpc ]
+    branches: [ feature-build-vpc ]  # Only trigger for the feature-build-vpc branch
   pull_request:
     branches: [ master ]
 
