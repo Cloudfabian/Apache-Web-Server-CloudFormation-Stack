@@ -1,0 +1,145 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Scalable and Resilient Web Server Infrastructure
+Resources:
+  # First, we create a VPC
+  myVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 172.32.0.0/16
+      EnableDnsSupport: false
+      EnableDnsHostnames: false
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: 172.32.10.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: us-east-1a   # Get the first AZ on the list
+    
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: 172.32.20.0/24
+      AvailabilityZone: us-east-1b   # Get the second AZ on the list
+      
+  # PublicRouteTable resource definition
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref myVPC
+
+  # PrivateRouteTable resource definition
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref myVPC
+
+  # Attach the public subnets to public route tables,
+  # and attach the private subnets to private route tables:
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+    
+  PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrivateRouteTable
+      
+  # The VPC will need internet access: 
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  InternetAttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    # You can't attach an IGW to a VPC unless both are created:
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref myVPC
+
+  # A Nat Gateway:
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+       AllocationId: !GetAtt ElasticIPAddress.AllocationId
+       SubnetId: !Ref PublicSubnet
+
+  # Route for directing internet-bound traffic via Internet Gateway
+  InternetGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PublicRouteTable
+
+  # Route for directing outgoing traffic through a NAT Gateway
+  NatGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+      RouteTableId: !Ref PrivateRouteTable
+
+  # Elastic IP address resource for NAT Gateway
+  ElasticIPAddress:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetAttachGateway
+    Properties:
+      # Specify the domain as 'vpc' to associate the EIP with the VPC
+      Domain: vpc
+
+  # Security Group for controlling inbound traffic
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      # Description of the security group's purpose
+      GroupDescription: Allow SSH and HTTP traffic
+      # Define inbound rules for SSH and HTTP
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          
+  # EC2 Instance with a Web 
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0f34c5ae932e6f0e4
+      SecurityGroupIds:
+        - !GetAtt "MySecurityGroup.GroupId"
+      UserData: !Base64 |
+          #!/bin/bash
+
+          # Update the system and install necessary packages
+          yum update -y
+          yum install -y httpd
+
+          # Start and enable the Apache web server
+          systemctl start httpd
+          systemctl enable httpd
+          
+          # Install the Git version control system
+          yum install -y git
+
+          # Clone a website template repository from GitHub
+          git clone https://github.com/notonprem/website_template.git
+
+          # Copy website content to the web server's document root
+          sudo cp -r website_template/* /var/www/html/
+
+Outputs:
+  # This output provides the public IP address of the EC2 instance.
+  # It allows you to easily access the website hosted on the instance.
+  PublicIp:
+    Description: My instance Public Ip
+    Value: !GetAtt MyInstance.PublicIp
